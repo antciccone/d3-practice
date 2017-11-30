@@ -1,18 +1,20 @@
 <!DOCTYPE html>
-<head>
-  <meta charset="utf-8">
-  <script src="https://d3js.org/d3.v4.min.js"></script>
-  <style>
-    body { margin:0;position:fixed;top:0;right:0;bottom:0;left:0; }
-    svg {
-      width: 100%;
-      height: 100%;
-    }
-  </style>
-</head>
+<meta charset="utf-8">
+<style>
 
-<body>
-  <svg></svg>
- 	<script src="./js/scale.js"></script>
-</body>
+.bar {
+  fill: steelblue;
+}
 
+.bar:hover {
+  fill: brown;
+}
+
+.axis--x path {
+  display: none;
+}
+
+</style>
+<svg width="960" height="500"></svg>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="./js/scale.js"></script>

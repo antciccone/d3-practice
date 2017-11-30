@@ -1,40 +1,41 @@
-var city = 'New York';
-var width = 800;
-var height = 300;
-var margin = {top: 20, bottom: 20, left: 20, right: 20};
+var svg = d3.select("svg"),
+    margin = {top: 20, right: 20, bottom: 30, left: 40},
+    width = +svg.attr("width") - margin.left - margin.right,
+    height = +svg.attr("height") - margin.top - margin.bottom;
 
-// dataset of city temperatures across time
-d3.tsv('./data/data.tsv', (err, data) => {
-  // clean the data
-  data.forEach(d => {
-    d.date = d3.timeParse("%Y%m%d")(d.date);
-    d.date = new Date(d.date); // x
-    ++d[city]; // y
-    console.log(d[city])
-  });
+var x = d3.scaleBand().rangeRound([0, width]).padding(0.1),
+    y = d3.scaleLinear().rangeRound([height, 0]);
 
+var g = svg.append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-  //scales
-  var xExtent = d3.extent(data, function (d){
-    return d.date
-  });
-  var xScale = d3.scaleTime()
-    .domain(xExtent)
-    .range([margin.left, width - margin.right])
+d3.tsv("./data/data.tsv", function(error, data) {
+  var yMax = d3.max(data, d => d.frequency)
 
-  var yExtent = d3.extent(data, function(d){
-    return d[city]
-  })
-  var yscale = d3.scaleLinear()
-    .domain(yExtent)
-    .range([height- margin.bottom, margin.top])
+  x.domain(data.map(function(d) { return d.letter; }));
+  y.domain([0, yMax]);
 
+  g.append("g")
+    .attr("class", "axis axis--x")
+    .attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(x));
 
-  //create the regtangles
-  var svg = d3.select('svg')
-  var rect = svg.selectAll('rect')
+  g.append("g")
+    .attr("class", "axis axis--y")
+    .call(d3.axisLeft(y).ticks(10, "%"))
+    .append("text")
+    .attr("y", 6)
+    .attr("dy", "0.71em")
+    .attr("text-anchor", "end")
+    .text("Frequency");
+
+  g.selectAll(".bar")
     .data(data)
-    .enter().append('rect')
-    .attr('width', 5)
+    .enter().append("rect")
+    .attr("class", "bar")
+    .attr("x", function(d) { return x(d.letter); })
+    .attr("y", function(d) { return y(d.frequency); })
+    .attr("width", x.bandwidth())
+    .attr("height", function(d) { return height - y(d.frequency); });
 });
 
